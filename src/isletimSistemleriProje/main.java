@@ -9,19 +9,19 @@ public class main
 	static int sayac=0;
 	static int toplamSatirSayisi=0;
 	static int ilkVaris=0;
-	static int kacinciSatirdaKaldik=0; // bu daha yap�lmad�
-	static int gecenSure=0; // bu daha yap�lmad�
+	static int kacinciSatirdaKaldik=0; 
+	static int gecenSure=0; 
 	static int realTimeKuyrukElemanSayisi=0, birOncelikliKuyrukElemanSayisi=0,
 			ikiOncelikliKuyrukElemanSayisi=0, ucOncelikliKuyrukElemanSayisi=0;
 	static Kuyruk realTimeKuyruk,birOncelikliKuyruk,ikiOncelikliKuyruk,ucOncelikliKuyruk;
 	static int realTimeKuyrukIlkCount=0;
 	static int ilkWhileOkuduguSatir=0, ikinciWhileOkuduguSatir=0;
-	
+	static String txtYolu;
 	
 	static void txtIlkOkuma() throws IOException
 	{
-		File file = new File("sayilar.txt");
-		if(!file.exists()) // okunacak dosya varm�
+		File file = new File(txtYolu);
+		if(!file.exists()) // okunacak dosya varmı
 		{
 			return;
 		}
@@ -32,39 +32,37 @@ public class main
 		
 		while((line=bReader.readLine()) != null) // satir bitene kadar oku
 		{
-			if(line.length()<=0 || line==null || line=="") // sat�r bo� mu
+			if(line.length()<=0 || line==null || line=="") // satır boş mu
 			{}
 			else
 			{
 				String[] bol=line.split(","); // bol[0]-bol[1]-bol[2] olustu. 
-											  // 0=Var�sDegeri, 1=OncelikDegeri, 2=CalismaSuresi
+											  // 0=VarisDegeri, 1=OncelikDegeri, 2=CalismaSuresi
 				// ilkVar�s Degerini al�yoruz
 				if(toplamSatirSayisi==0) // ilk satir ise
 				{
 					ilkVaris=Integer.parseInt(bol[0]);
 				}
 				
-				//RealTimeKuyruk'a atanacak kac adet satir var onun say�s�n� bulal�m
+				//RealTimeKuyruk'a atanacak kac adet satir var onun sayısını bulalım
 				// javada dizi uzunlugu belirtilmek zorunda
 				if(Integer.parseInt(bol[1])==0)
 					realTimeKuyrukElemanSayisi++;
 				
-				//birOncelikliKuyruk'a atanacak kac adet satir var onun say�s�n� bulal�m
+				//birOncelikliKuyruk'a atanacak kac adet satir var onun sayısını bulalım
 				if(Integer.parseInt(bol[1])==1)
 					birOncelikliKuyrukElemanSayisi++;
 				
-				//ikiOncelikliKuyruk'a atanacak kac adet satir var onun say�s�n� bulal�m
+				//ikiOncelikliKuyruk'a atanacak kac adet satir var onun sayısını bulalım
 				if(Integer.parseInt(bol[1])==2)
 					ikiOncelikliKuyrukElemanSayisi++;
 				
-				//ucOncelikliKuyruk'a atanacak kac adet satir var onun say�s�n� bulal�m
+				//ucOncelikliKuyruk'a atanacak kac adet satir var onun sayısını bulalım
 				if(Integer.parseInt(bol[1])==3)
-					ucOncelikliKuyrukElemanSayisi++;
-				
-				//Txt'de ki Toplam sat�r say�s�n� tutan degisken
-				
+					ucOncelikliKuyrukElemanSayisi++;		
 			} // else sonu
 			
+			//Txt'de ki Toplam sat�r say�s�n� tutan degisken
 			toplamSatirSayisi++;
 		} // while sonu
 	} // txtIlkOkuma sonu
@@ -72,10 +70,10 @@ public class main
 	// Fonksiyon kendini tekrar tekrar cagiracagi icin gerekli parametreler verildi.
 	static void oku(int oVarisZamaninaKadarOku, int kacinciSatirdaKaldik) throws IOException
 	{
-		//Sat�r sat�r kontrol edip hangi kuyruga atanmas� gerekiyor o i�lemler ger�ekle�tiriliyor.
-		//Satiri ay�rarak degiskenlere at�yoruz
-		File file = new File("sayilar.txt");
-		if(!file.exists()) // Okunacak dosya var m�, kontrol ediliyor
+		//Satır satır kontrol edip hangi kuyruga atanması gerekiyor o islemler gerceklestiriliyor.
+				//Satiri ayırarak degiskenlere atıyoruz
+		File file = new File(txtYolu);
+		if(!file.exists()) // Okunacak dosya var mı, kontrol ediliyor
 		{return;}
 		
 		FileReader fReader=new FileReader(file);
@@ -89,7 +87,7 @@ public class main
 		int i=0;
 		while((line=bReader.readLine()) != null) // satir bitene kadar oku
 		{
-			if(line.length()<=0 || line==null || line=="") // sat�r bo� mu
+			if(line.length()<=0 || line==null || line=="") // satir bos mu
 			{}
 			else
 			{
@@ -104,7 +102,7 @@ public class main
 				 * Eger gecenSure'den düsükse gecenSure=oSatırınVarısZamanı dememiz gerekiyor.*/
 				while((line2=bReader2.readLine()) != null) //satirBiteneKadarOku
 				{
-					if(line2.length()<=0 || line2==null || line2=="") // sat�r bos mu
+					if(line2.length()<=0 || line2==null || line2=="") // satir bos mu
 					{}
 					else
 					{
@@ -134,43 +132,44 @@ public class main
 			
 				if(i>=kacinciSatirdaKaldik && varisZamani<=oVarisZamaninaKadarOku)
 				{
-					//Proses olu�turulup ilgili kuyru�a ekleniyor.
+					// Proses oluşturulup ilgili kuyruğa ekleniyor.
 					Proses proses=new Proses(pid, varisZamani, oncelik, calismaSuresi,Status.ready,Renkler.renk[i%7]);
 					kacinciSatirdaKaldik=i+1;
 					if(oncelik==0)
 					{
-						if(realTimeKuyrukElemanSayisi!=0) // realTimeKuyruguna eklenecek sat�r varsa
+						if(realTimeKuyrukElemanSayisi!=0) // realtimeKuyruk'a eklenecek satir varsa
 							realTimeKuyruk.insert(proses);
 					}
 					else if(oncelik==1)
 					{
-						if(birOncelikliKuyrukElemanSayisi!=0)
+						if(birOncelikliKuyrukElemanSayisi!=0) // birOncelikliKuyruk'a eklenecek satir varsa
 							birOncelikliKuyruk.insert(proses);
 					}
 					else if(oncelik==2)
 					{
-						if(ikiOncelikliKuyrukElemanSayisi!=0)
+						if(ikiOncelikliKuyrukElemanSayisi!=0) // ikiOncelikliKuyruk'a eklenecek satir varsa
 							ikiOncelikliKuyruk.insert(proses);
 					}
 					else if(oncelik==3)
 					{
-						if(ucOncelikliKuyrukElemanSayisi!=0)
+						if(ucOncelikliKuyrukElemanSayisi!=0) // ucOncelikliKuyruk'a eklenecek satir varsa
 							ucOncelikliKuyruk.insert(proses);
 					}
 				
 				}
-			} // else sonu(sat�r kontrol k�sm�ndaki)
+			} // else sonu(sat�r kontrol kısmındaki)
 			i++;
 			ilkWhileOkuduguSatir++;
 		} // while sonu
 
 		
-		/*__________ Proses kuyru�una g�re, Kuyruk i�lemleri yap�l�yor. ________*/
+		/*________________ Proses kuyruğuna göre Kuyruk İşlemleri Yapılıyor.. _______________*/
+		
 		
 		/* realTimeKuyruk işlemi */
 		for(int j=0; j<realTimeKuyruk.count(); j++)
 		{
-			if(realTimeKuyruk.indexOf(j).calismaSuresi==0) // calismaSuresi=0 ise proses �lm��t�r(i�ini bitirmi�tir)
+			if(realTimeKuyruk.indexOf(j).calismaSuresi==0) // calismaSuresi=0 ise proses ölmüştür(işini bitirmiştir)
 			{}
 			else // proses bitmemiş ise (hala yaşıyorsa)
 			{
@@ -187,7 +186,6 @@ public class main
 						realTimeKuyruk.indexOf(j).oncelik=0;
 						realTimeKuyruk.indexOf(j).calismaSuresi=0;
 						realTimeKuyruk.indexOf(j).terminatedProses();
-						
 						//oku(gecenSure,kacinciSatirdaKaldik);
 					}
 				}
@@ -228,9 +226,6 @@ public class main
 			} // else sonu
 		} // for sonu
 		/* realTimeKuyruk işlemi bitti*/
-		
-		
-		//System.out.println(i+"değerli proses geçen süre: "+gecenSure);
 		
 		
 		/* birOncelikliKuyruk işlemi */
@@ -406,28 +401,95 @@ public class main
 		/* ikiOncelikliKuyruk işlemi bitti */
 		
 		
+		/* ucOncelikliKuyruk işlemi*/
+		for(int s=0; s<ucOncelikliKuyruk.count(); s++)
+		{
+			// Eğer proses oluştuğundan itibaren 20 saniye geçtiyse kendi kendine ölüyor
+			if((gecenSure-ucOncelikliKuyruk.indexOf(s).varisZamani)>=20)
+			{
+				// proses zaten ölmüş mü ölmemiş mi bakalım
+				if(ucOncelikliKuyruk.indexOf(s).durum==Status.killed) // zaten ölmüşse bir şey yapma
+				{}
+				else // ölmemiş ise ölsün
+				{
+					// Biz bu öldürme işlemini degerlerini 0'layarak belirtiyoruz.
+					ucOncelikliKuyruk.indexOf(s).varisZamani=0;
+					ucOncelikliKuyruk.indexOf(s).oncelik=0;
+					ucOncelikliKuyruk.indexOf(s).calismaSuresi=0;
+					ucOncelikliKuyruk.indexOf(s).terminatedProses();
+					//oku(gecenSure,kacinciSatirdaKaldik);
+				}
+			}
+			else // Eğer proses oluşalı 20 saniye olmadıysa, işlemlerini gerçekleştirsin
+			{
+				if(ucOncelikliKuyruk.indexOf(s).calismaSuresi==0 && ucOncelikliKuyruk.indexOf(s).durum==Status.killed) // calismaSuresi=0 ise proses işlemini bitirmiştir ()
+				{} // proses ölmüştür
+				else if(ucOncelikliKuyruk.indexOf(s).calismaSuresi==1) //gelen proses 1 saniyelik calisma zamanına sahipse calisir ve ölür 
+				{
+						//Proses calismaya basladi // (1saniye)
+						ucOncelikliKuyruk.indexOf(s).startProses(); 
+						gecenSure+=1;
+						
+						int prosesId=ucOncelikliKuyruk.indexOf(s).prosesId;
+						int prosesinCalismaSuresi=ucOncelikliKuyruk.indexOf(s).calismaSuresi;
+						ucOncelikliKuyruk.indexOf(s).ProsesCalistir(prosesId, prosesinCalismaSuresi);
+						
+						// Proses ölür
+						ucOncelikliKuyruk.indexOf(s).varisZamani=0;
+						ucOncelikliKuyruk.indexOf(s).oncelik=0;
+						ucOncelikliKuyruk.indexOf(s).calismaSuresi=0;
+						ucOncelikliKuyruk.indexOf(s).terminatedProses();
+						
+						//Tekrar Txt'den okuma islemi yap
+						oku(gecenSure,kacinciSatirdaKaldik);
+				}
+				else // proses bitmemiş ise (hala yaşıyorsa/ölmediyse)
+				{
+					//Proses calismaya basladi
+					ucOncelikliKuyruk.indexOf(s).startProses(); 
+					gecenSure+=1;
+					
+					// Bir saniye calistir ve askiya al
+					int prosesId=ucOncelikliKuyruk.indexOf(s).prosesId;
+					int prosesinCalismaSuresi=ucOncelikliKuyruk.indexOf(s).calismaSuresi;
+					ucOncelikliKuyruk.indexOf(s).ProsesCalistir(prosesId, prosesinCalismaSuresi);
+					
+					//Prosesi askıya al
+					ucOncelikliKuyruk.indexOf(s).prosesAskiyaAlindi();
+					
+					//Tekrar Txt'den okuma islemi yap
+					oku(gecenSure,kacinciSatirdaKaldik);
+				}
+			}
+		} // for sonu
+		/* ucOncelikliKuyruk işlemi bitti */
+		
 	} // oku sonu
 	
 	
 	public static void main(String[] args) throws IOException
 	{
-		//Baslangicta Txt'yi oku ve gerekli degiskenlere degerlerini ata
-		txtIlkOkuma();
-		
-		//Öncelik degerleri bir arttigi icin 1'de ki 2'ye geçicek, 2'de ki 3'e geçicek
-		ikiOncelikliKuyrukElemanSayisi=birOncelikliKuyrukElemanSayisi+ikiOncelikliKuyrukElemanSayisi;
-		ucOncelikliKuyrukElemanSayisi=ikiOncelikliKuyrukElemanSayisi+ucOncelikliKuyrukElemanSayisi;
-		
-		//Kuyruklar� Olustural�m
-		realTimeKuyruk=new Kuyruk(realTimeKuyrukElemanSayisi);
-		birOncelikliKuyruk=new Kuyruk(birOncelikliKuyrukElemanSayisi);
-		ikiOncelikliKuyruk=new Kuyruk(ikiOncelikliKuyrukElemanSayisi);
-		ucOncelikliKuyruk=new Kuyruk(ucOncelikliKuyrukElemanSayisi);
-		
-		//Simdi prosesler icin txt' okumalar�na basla
-		oku(ilkVaris,kacinciSatirdaKaldik);		
-		//oku(oVarisZamaninaKadarOku,kacinciSatirdaKaldik)
-	
+		if(args.length<=0) // eğer bir parametre girmezse
+		{}
+		else
+		{
+			txtYolu=args[0];
+			//Baslangicta Txt'yi oku ve gerekli degiskenlere degerlerini ata
+			txtIlkOkuma();
+			
+			//Öncelik degerleri bir arttigi icin 1'de ki 2'ye geçicek, 2'de ki 3'e geçicek
+			ikiOncelikliKuyrukElemanSayisi=birOncelikliKuyrukElemanSayisi+ikiOncelikliKuyrukElemanSayisi;
+			ucOncelikliKuyrukElemanSayisi=ikiOncelikliKuyrukElemanSayisi+ucOncelikliKuyrukElemanSayisi;
+			
+			//Kuyruklar� Olustural�m
+			realTimeKuyruk=new Kuyruk(realTimeKuyrukElemanSayisi);
+			birOncelikliKuyruk=new Kuyruk(birOncelikliKuyrukElemanSayisi);
+			ikiOncelikliKuyruk=new Kuyruk(ikiOncelikliKuyrukElemanSayisi);
+			ucOncelikliKuyruk=new Kuyruk(ucOncelikliKuyrukElemanSayisi);
+			
+			//Simdi prosesler icin txt' okumalar�na basla
+			oku(ilkVaris,kacinciSatirdaKaldik);		
+			//oku(oVarisZamaninaKadarOku,kacinciSatirdaKaldik)
+		}
 	}
-
 }
