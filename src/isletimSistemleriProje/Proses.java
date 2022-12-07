@@ -29,11 +29,12 @@ public class Proses
 	}
 	public void ProsesCalistir(int _prosesId, int _calismaSuresi) {
 		
-		//Ekrana çalıştırılma bilgisi yazdırılıyor
-		System.out.print(renk+" "+_prosesId+" Id li proses calisiyor..." +" Kalan sure:"+calismaSuresi+RESET+"\n");		
-		
+	
 		//Baslama süresi azaltiliyor
 		calismaSuresi=_calismaSuresi-1;
+		
+		//Ekrana çalıştırılma bilgisi yazdırılıyor
+		System.out.print(renk+" "+_prosesId+" Id li proses calisiyor..." +" Kalan sure:"+calismaSuresi+RESET+"\n");		
 		
 		//1 saniye islem süresi
 		try {
@@ -57,10 +58,12 @@ public class Proses
 	public void prosesAskiyaAlindi()
 	{
 		durum=Status.waiting;
+		/*
 		if(oncelik>=1 && oncelik<3)
 			oncelik=oncelik+1;
 		else
 		{}
+		*/
 		System.out.println(renk+prosesId+" Id kimliğine sahip Proses Askıya Alındı!"+RESET);
 	}
 }

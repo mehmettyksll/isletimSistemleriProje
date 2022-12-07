@@ -1,11 +1,5 @@
 package isletimSistemleriProje;
-/*
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-*/
+
 import java.io.*;
 
 import isletimSistemleriProje.Proses.Status;
@@ -180,37 +174,57 @@ public class main
 			{}
 			else // proses bitmemiş ise (hala yaşıyorsa)
 			{
-				int oSatiraKadarOkuDegeri=0;
-				if(j==0 && realTimeKuyruk.indexOf(j).durum!=Status.killed) {
-					 oSatiraKadarOkuDegeri=realTimeKuyruk.indexOf(j).varisZamani + realTimeKuyruk.indexOf(j).calismaSuresi;
-				}
-				else {
-					 oSatiraKadarOkuDegeri= realTimeKuyruk.indexOf(j).calismaSuresi;
-				}
-				realTimeKuyruk.indexOf(j).startProses(); //Proses calismaya basladi
-				
-				gecenSure+=oSatiraKadarOkuDegeri;
-				// System.out.print("GSure:"+gecenSure);
-				
-				// Eger proses realTimeKuyrugunda ise işi bitene kadar çalışır ve sonlanır.
-				int prosesId=realTimeKuyruk.indexOf(j).prosesId;
-				int prosesinCalismaSuresi=realTimeKuyruk.indexOf(j).calismaSuresi;
-				for(int k=0; k<prosesinCalismaSuresi; k++)
+				// Eğer proses oluştuğundan itibaren 20 saniye geçtiyse kendi kendine ölüyor
+				if((gecenSure-realTimeKuyruk.indexOf(j).varisZamani)>=20)
 				{
-					realTimeKuyruk.indexOf(j).ProsesCalistir( realTimeKuyruk.indexOf(j).prosesId ,realTimeKuyruk.indexOf(j).calismaSuresi);	
+					// proses zaten ölmüş mü ölmemiş mi bakalım
+					if(realTimeKuyruk.indexOf(j).durum==Status.killed) // zaten ölmüşse bir şey yapma
+					{}
+					else // ölmemiş ise ölsün
+					{
+						// Biz bu öldürme işlemini degerlerini 0'layarak belirtiyoruz.
+						realTimeKuyruk.indexOf(j).varisZamani=0;
+						realTimeKuyruk.indexOf(j).oncelik=0;
+						realTimeKuyruk.indexOf(j).calismaSuresi=0;
+						realTimeKuyruk.indexOf(j).terminatedProses();
+						
+						//oku(gecenSure,kacinciSatirdaKaldik);
+					}
 				}
-				
-				// Biz bu öldürme işlemini degerlerini 0'layarak belirtiyoruz.
-				realTimeKuyruk.indexOf(j).varisZamani=0;
-				realTimeKuyruk.indexOf(j).oncelik=0;
-				realTimeKuyruk.indexOf(j).calismaSuresi=0;
-				realTimeKuyruk.indexOf(j).terminatedProses();
-				
-				//Tekrar Txt'den okuma işlemi yapsın ve diğer satırları okuyarak process işlemine devam etsin.
-				//System.out.print("Gecensure:"+gecenSure+"\n");
-				//oVarisZamaninaKadarOku=gecenSure;
-				oku(gecenSure,kacinciSatirdaKaldik);
-				//oku(oVarisZamaninaKadarOku,kacinciSatirdaKaldik)
+				else
+				{
+					int oSatiraKadarOkuDegeri=0;
+					if(j==0 && realTimeKuyruk.indexOf(j).durum!=Status.killed) {
+						 oSatiraKadarOkuDegeri=realTimeKuyruk.indexOf(j).varisZamani + realTimeKuyruk.indexOf(j).calismaSuresi;
+					}
+					else {
+						 oSatiraKadarOkuDegeri= realTimeKuyruk.indexOf(j).calismaSuresi;
+					}
+					realTimeKuyruk.indexOf(j).startProses(); //Proses calismaya basladi
+					
+					gecenSure+=oSatiraKadarOkuDegeri;
+					// System.out.print("GSure:"+gecenSure);
+					
+					// Eger proses realTimeKuyrugunda ise işi bitene kadar çalışır ve sonlanır.
+					int prosesId=realTimeKuyruk.indexOf(j).prosesId;
+					int prosesinCalismaSuresi=realTimeKuyruk.indexOf(j).calismaSuresi;
+					for(int k=0; k<prosesinCalismaSuresi; k++)
+					{
+						realTimeKuyruk.indexOf(j).ProsesCalistir( realTimeKuyruk.indexOf(j).prosesId ,realTimeKuyruk.indexOf(j).calismaSuresi);	
+					}
+					
+					// Biz bu öldürme işlemini degerlerini 0'layarak belirtiyoruz.
+					realTimeKuyruk.indexOf(j).varisZamani=0;
+					realTimeKuyruk.indexOf(j).oncelik=0;
+					realTimeKuyruk.indexOf(j).calismaSuresi=0;
+					realTimeKuyruk.indexOf(j).terminatedProses();
+					
+					//Tekrar Txt'den okuma işlemi yapsın ve diğer satırları okuyarak process işlemine devam etsin.
+					//System.out.print("Gecensure:"+gecenSure+"\n");
+					//oVarisZamaninaKadarOku=gecenSure;
+					oku(gecenSure,kacinciSatirdaKaldik);
+					//oku(oVarisZamaninaKadarOku,kacinciSatirdaKaldik)
+				} // else sonu(20 saniye geçti mi)
 			} // else sonu
 		} // for sonu
 		/* realTimeKuyruk işlemi bitti*/
@@ -222,55 +236,175 @@ public class main
 		/* birOncelikliKuyruk işlemi */
 		for(int p=0; p<birOncelikliKuyruk.count(); p++)
 		{
-			if(birOncelikliKuyruk.indexOf(p).calismaSuresi==0 && birOncelikliKuyruk.indexOf(p).durum==Status.killed) // calismaSuresi=0 ise proses işlemini bitirmiştir ()
-			{}
-			else if(birOncelikliKuyruk.indexOf(p).calismaSuresi==1) //gelen proses 1 saniyelik calisma zamanına sahipse calisir ve ölür 
+			// Eğer proses oluştuğundan itibaren 20 saniye geçtiyse kendi kendine ölüyor
+			if((gecenSure-birOncelikliKuyruk.indexOf(p).varisZamani)>=20)
 			{
-				if(birOncelikliKuyruk.indexOf(p).durum==Status.waiting) //eger askiya alinmiş ve bir saniyesi kalmış ise bir şey yapma
+				// proses zaten ölmüş mü ölmemiş mi bakalım
+				if(birOncelikliKuyruk.indexOf(p).durum==Status.killed) // zaten ölmüşse bir şey yapma
 				{}
-				else // proses yeni gelmiş ve bir saniyelik çalışma süresi varsa çalış ve öldür
+				else // ölmemiş ise ölsün
 				{
-					//Proses calismaya basladi // (1saniye)
-					birOncelikliKuyruk.indexOf(p).startProses(); 
-					gecenSure+=1;
-					
-					// Eger proses birOncelikliKuyruk ise bir saniye çalışır ve ölür.
-					int prosesId=birOncelikliKuyruk.indexOf(p).prosesId;
-					int prosesinCalismaSuresi=birOncelikliKuyruk.indexOf(p).calismaSuresi;
-					birOncelikliKuyruk.indexOf(p).ProsesCalistir(prosesId, prosesinCalismaSuresi);
-					
-					// Proses ölür
+					// Biz bu öldürme işlemini degerlerini 0'layarak belirtiyoruz.
 					birOncelikliKuyruk.indexOf(p).varisZamani=0;
 					birOncelikliKuyruk.indexOf(p).oncelik=0;
 					birOncelikliKuyruk.indexOf(p).calismaSuresi=0;
 					birOncelikliKuyruk.indexOf(p).terminatedProses();
+					//oku(gecenSure,(kacinciSatirdaKaldik+1));
 				}
 			}
-			else if(birOncelikliKuyruk.indexOf(p).durum==Status.waiting) //proses askıya alınmışsa
+			else
 			{
-				//oncelik degeri arttırılmıştır, bir işlem yapma
+				if(birOncelikliKuyruk.indexOf(p).calismaSuresi==0 && birOncelikliKuyruk.indexOf(p).durum==Status.killed) // calismaSuresi=0 ise proses işlemini bitirmiştir ()
+				{}
+				else if(birOncelikliKuyruk.indexOf(p).calismaSuresi==1) //gelen proses 1 saniyelik calisma zamanına sahipse calisir ve ölür 
+				{
+					if(birOncelikliKuyruk.indexOf(p).durum==Status.waiting) //eger askiya alinmiş ve bir saniyesi kalmış ise bir şey yapma
+					{}
+					else // proses yeni gelmiş ve bir saniyelik çalışma süresi varsa çalış ve öldür
+					{
+						//Proses calismaya basladi // (1saniye)
+						birOncelikliKuyruk.indexOf(p).startProses(); 
+						gecenSure+=1;
+						
+						// Eger proses birOncelikliKuyruk ise bir saniye çalışır ve ölür.
+						int prosesId=birOncelikliKuyruk.indexOf(p).prosesId;
+						int prosesinCalismaSuresi=birOncelikliKuyruk.indexOf(p).calismaSuresi;
+						birOncelikliKuyruk.indexOf(p).ProsesCalistir(prosesId, prosesinCalismaSuresi);
+						
+						// Proses ölür
+						birOncelikliKuyruk.indexOf(p).varisZamani=0;
+						birOncelikliKuyruk.indexOf(p).oncelik=0;
+						birOncelikliKuyruk.indexOf(p).calismaSuresi=0;
+						birOncelikliKuyruk.indexOf(p).terminatedProses();
+						
+						//Tekrar Txt'den okuma islemi yap
+						oku(gecenSure,kacinciSatirdaKaldik);
+					}
+				}
+				else if(birOncelikliKuyruk.indexOf(p).durum==Status.waiting) //proses askıya alınmışsa
+				{
+					//oncelik degeri arttırılmıştır, bir işlem yapma
+					//Tekrar Txt'den okuma islemi yap
+					//oku(gecenSure,kacinciSatirdaKaldik);
+				}
+				else // proses bitmemiş ise (hala yaşıyorsa ve askıda degilse)
+				{
+					//Proses calismaya basladi
+					birOncelikliKuyruk.indexOf(p).startProses(); 
+					gecenSure+=1;
+					
+					// Eger proses birOncelikliKuyruk ise bir saniye çalışır,askıya alınır ve ikiOncelikliKuyruk'a eklenir.
+					int prosesId=birOncelikliKuyruk.indexOf(p).prosesId;
+					int prosesinCalismaSuresi=birOncelikliKuyruk.indexOf(p).calismaSuresi;
+					birOncelikliKuyruk.indexOf(p).ProsesCalistir(prosesId, prosesinCalismaSuresi);
+					
+					int varisZamani=birOncelikliKuyruk.indexOf(p).varisZamani;
+					int oncelik=2;
+					Status durum=Status.ready;
+					String renk=birOncelikliKuyruk.indexOf(p).renk;
+					int kalanCalismaSuresi=birOncelikliKuyruk.indexOf(p).calismaSuresi;
+					//System.out.println("kalanCalismaSuresi: "+kalanCalismaSuresi);
+					Proses proses=new Proses(prosesId,varisZamani,oncelik,kalanCalismaSuresi,durum,renk);
+					ikiOncelikliKuyruk.insert(proses); // iki öncelikliye eklendi
+					
+					//Prosesi askıya al
+					birOncelikliKuyruk.indexOf(p).prosesAskiyaAlindi();
+					
+					//System.out.println(birOncelikliKuyruk.indexOf(p).calismaSuresi);
+					//Tekrar Txt'den okuma islemi yap
+					oku(gecenSure,kacinciSatirdaKaldik);
+					
+				} // else sonu (proses bitmemiş ise)
 			}
-			else // proses bitmemiş ise (hala yaşıyorsa ve askıda degilse)
-			{
-				//Proses calismaya basladi
-				birOncelikliKuyruk.indexOf(p).startProses(); 
-				gecenSure+=1;
-				
-				// Eger proses birOncelikliKuyruk ise bir saniye çalışır,askıya alınır ve ikiOncelikliKuyruk'a eklenir.
-				int prosesId=birOncelikliKuyruk.indexOf(p).prosesId;
-				int prosesinCalismaSuresi=birOncelikliKuyruk.indexOf(p).calismaSuresi;
-				birOncelikliKuyruk.indexOf(p).ProsesCalistir(prosesId, prosesinCalismaSuresi);
-				ikiOncelikliKuyruk.insert(birOncelikliKuyruk.indexOf(p)); // iki öncelikliye eklendi
-				
-				//Prosesi askıya al
-				birOncelikliKuyruk.indexOf(p).prosesAskiyaAlindi();
-				
-				//Tekrar Txt'den okuma islemi yap
-				oku(gecenSure,kacinciSatirdaKaldik);
-				
-			} // else sonu (proses bitmemiş ise)
 		} // for sonu
-		/* birOncelikliKuyruk işlemi bitti*/
+		/* birOncelikliKuyruk işlemi bitti */
+		
+		
+		
+		
+		/* ikiOncelikliKuyruk işlemi */
+		for(int r=0; r<ikiOncelikliKuyruk.count(); r++)
+		{
+			// Eğer proses oluştuğundan itibaren 20 saniye geçtiyse kendi kendine ölüyor
+			if((gecenSure-ikiOncelikliKuyruk.indexOf(r).varisZamani)>=20)
+			{
+				// proses zaten ölmüş mü ölmemiş mi bakalım
+				if(ikiOncelikliKuyruk.indexOf(r).durum==Status.killed) // zaten ölmüşse bir şey yapma
+				{}
+				else // ölmemiş ise ölsün
+				{
+					// Biz bu öldürme işlemini degerlerini 0'layarak belirtiyoruz.
+					ikiOncelikliKuyruk.indexOf(r).varisZamani=0;
+					ikiOncelikliKuyruk.indexOf(r).oncelik=0;
+					ikiOncelikliKuyruk.indexOf(r).calismaSuresi=0;
+					ikiOncelikliKuyruk.indexOf(r).terminatedProses();
+					//oku(gecenSure,kacinciSatirdaKaldik);
+				}
+			}
+			else // Eğer proses oluşalı 20 saniye olmadıysa
+			{
+				if(ikiOncelikliKuyruk.indexOf(r).calismaSuresi==0 && ikiOncelikliKuyruk.indexOf(r).durum==Status.killed) // calismaSuresi=0 ise proses işlemini bitirmiştir ()
+				{}
+				else if(ikiOncelikliKuyruk.indexOf(r).calismaSuresi==1) //gelen proses 1 saniyelik calisma zamanına sahipse calisir ve ölür 
+				{
+					if(ikiOncelikliKuyruk.indexOf(r).durum==Status.waiting) //eger askiya alinmiş ve bir saniyesi kalmış ise bir şey yapma
+					{}
+					else // proses yeni gelmiş ve bir saniyelik çalışma süresi varsa çalış ve öldür
+					{
+						//Proses calismaya basladi // (1saniye)
+						ikiOncelikliKuyruk.indexOf(r).startProses(); 
+						gecenSure+=1;
+						
+						// Eger proses ikiOncelikliKuyruk ise bir saniye çalışır ve ölür.
+						int prosesId=ikiOncelikliKuyruk.indexOf(r).prosesId;
+						int prosesinCalismaSuresi=ikiOncelikliKuyruk.indexOf(r).calismaSuresi;
+						ikiOncelikliKuyruk.indexOf(r).ProsesCalistir(prosesId, prosesinCalismaSuresi);
+						
+						// Proses ölür
+						ikiOncelikliKuyruk.indexOf(r).varisZamani=0;
+						ikiOncelikliKuyruk.indexOf(r).oncelik=0;
+						ikiOncelikliKuyruk.indexOf(r).calismaSuresi=0;
+						ikiOncelikliKuyruk.indexOf(r).terminatedProses();
+						
+						//Tekrar Txt'den okuma islemi yap
+						oku(gecenSure,kacinciSatirdaKaldik);
+					}
+				}
+				else if(ikiOncelikliKuyruk.indexOf(r).durum==Status.waiting) //proses askıya alınmışsa
+				{
+					//oncelik degeri arttırılmıştır, bir işlem yapma
+					//Tekrar Txt'den okuma islemi yap
+					//oku(gecenSure,kacinciSatirdaKaldik);
+				}
+				else // proses bitmemiş ise (hala yaşıyorsa ve askıda degilse)
+				{
+					//Proses calismaya basladi
+					ikiOncelikliKuyruk.indexOf(r).startProses(); 
+					gecenSure+=1;
+					
+					// Eger proses ikiOncelikliKuyruk ise bir saniye çalışır,askıya alınır ve ucOncelikliKuyruk'a eklenir.
+					int prosesId=ikiOncelikliKuyruk.indexOf(r).prosesId;
+					int prosesinCalismaSuresi=ikiOncelikliKuyruk.indexOf(r).calismaSuresi;
+					ikiOncelikliKuyruk.indexOf(r).ProsesCalistir(prosesId, prosesinCalismaSuresi);
+					int varisZamani=ikiOncelikliKuyruk.indexOf(r).varisZamani;
+					int oncelik=3;
+					Status durum=Status.ready;
+					String renk=ikiOncelikliKuyruk.indexOf(r).renk;
+					int kalanCalismaSuresi=ikiOncelikliKuyruk.indexOf(r).calismaSuresi;
+					Proses proses=new Proses(prosesId,varisZamani,oncelik,kalanCalismaSuresi,durum,renk);
+					ucOncelikliKuyruk.insert(proses); // ucOncelikliKuyruk'a eklendi
+					
+					//Prosesi askıya al
+					ikiOncelikliKuyruk.indexOf(r).prosesAskiyaAlindi();
+					
+					//Tekrar Txt'den okuma islemi yap
+					oku(gecenSure,kacinciSatirdaKaldik);
+					
+				} // else sonu (proses bitmemiş ise)
+			}
+		} // for sonu
+		/* ikiOncelikliKuyruk işlemi bitti */
+		
 		
 	} // oku sonu
 	
