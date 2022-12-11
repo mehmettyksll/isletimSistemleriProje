@@ -15,6 +15,7 @@ public class Proses
 	public int varisZamani;
 	public int oncelik;
 	public int calismaSuresi;
+	static int enSonCalistigiZaman;
 	public String renk;
 	Status durum;
 	
@@ -22,19 +23,20 @@ public class Proses
 	{
 		prosesId=_prosesId;
 		varisZamani=_varisZamani;
+		//enSonCalistigiZaman=varisZamani;
 		oncelik=_oncelik;
 		calismaSuresi=_calismaSuresi;
 		durum=_durum;
 		renk=_renk;
 	}
-	public void ProsesCalistir(int _prosesId, int _calismaSuresi) {
+	public void ProsesCalistir(int _prosesId, int _calismaSuresi,int gecenSure) {
 		
 	
 		//Baslama süresi azaltiliyor
 		calismaSuresi=_calismaSuresi-1;
-		
+		enSonCalistigiZaman=gecenSure;
 		//Ekrana çalıştırılma bilgisi yazdırılıyor
-		System.out.print(renk+" "+_prosesId+" Id li proses calisiyor..." +" Kalan sure:"+calismaSuresi+RESET+"\n");		
+		System.out.print(renk+" "+_prosesId+" Id li " +oncelik+" oncelikli "+ "proses calisiyor..." +" Kalan sure:"+calismaSuresi+RESET+"\n");		
 		
 		//1 saniye islem süresi
 		try {
@@ -46,24 +48,23 @@ public class Proses
 	public void startProses()
 	{
 		durum=Status.running;
-		System.out.println(renk+prosesId+" Id kimliğine sahip Proses Başladı!"+RESET);
+		System.out.println(renk+prosesId+" Id kimligine sahip Proses Basladi!"+RESET);
 	}
 
 	public void terminatedProses()
 	{
 		durum=Status.killed;
-		System.out.println(renk+prosesId+" Id kimliğine sahip Proses Sonlandı!"+RESET);
+		System.out.println(renk+prosesId+" Id kimligine sahip Proses Sonlandi!"+RESET);
+	}
+	public void killProses()
+	{
+		durum=Status.killed;
+		System.out.println(renk+prosesId+" Id kimligine sahip Proses Olduruldu!!!!"+RESET);
 	}
 	
 	public void prosesAskiyaAlindi()
 	{
 		durum=Status.waiting;
-		/*
-		if(oncelik>=1 && oncelik<3)
-			oncelik=oncelik+1;
-		else
-		{}
-		*/
-		System.out.println(renk+prosesId+" Id kimliğine sahip Proses Askıya Alındı!"+RESET);
+		System.out.println(renk+prosesId+" Id kimligin sahip Proses Askiya Alindi!"+RESET);
 	}
 }
