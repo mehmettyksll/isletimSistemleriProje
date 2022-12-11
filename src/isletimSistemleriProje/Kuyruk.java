@@ -4,7 +4,7 @@ import isletimSistemleriProje.Proses.Status;
 
 public class Kuyruk
 {
-	 // private deðiþkenler
+	 // Class'a ait Private deðiþkenler
 	  private int maxBoyut;
 	  public Proses[] kuyrukDizi;
 	  private int front;
@@ -12,7 +12,6 @@ public class Kuyruk
 	  private int elemanSayisi;
 	   
 	  // constructor
-	  // kuyruk degisken_ismi = new kuyruk (eleman_sayisi);
 	  public Kuyruk (int boyut)
 	  {
 	    maxBoyut = boyut;
@@ -22,7 +21,7 @@ public class Kuyruk
 	    kuyrukDizi = new Proses[maxBoyut];
 	  }
 	   
-	  // metodlar
+	  // Metodlar
 	  
 	  // kuyrukta okunabilecek eleman varmi
 	  public boolean kuyruktaOkunacakElemanVarmi()
@@ -61,6 +60,7 @@ public class Kuyruk
 	    elemanSayisi++;
 	  }
 	  
+	  // index'i verilen prosese erisiyoruz.
 	  public Proses indexOf(int index)
 	  {
 		  if(index>elemanSayisi)

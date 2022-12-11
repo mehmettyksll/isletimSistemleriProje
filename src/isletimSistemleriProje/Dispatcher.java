@@ -9,46 +9,59 @@ import isletimSistemleriProje.Proses.Status;
 
 public class Dispatcher
 {
-	static public int sayac=0;
-	static public int toplamSatirSayisi=0;
-	static public int ilkVaris=0;
- 	static public int gecenSure=0; 
+	/*Gerekli degisken tanýmlamalarý yapýlýyor.*/
+	
+	static public int toplamSatirSayisi=0; // Txt'de bulunan toplam satir sayýsý
+	static public int ilkVaris=0; // Txt'de bulunan ilk prosesin varisSuresi tutuluyor
+ 	static public int gecenSure=0;  // Proseslerin calistiklarý surelerin toplamý tutuluyor
+ 	
+ 	// Proseslerin oncelik degerlerine göre kuyruk dizileri olusturulacak, bu dizilerin ne kadar uzunlukta olacagýný
+ 	// alttaki ilgili degiskenlerde tutuyoruz.
 	static public int realTimeKuyrukElemanSayisi=0, birOncelikliKuyrukElemanSayisi=0,
-			ikiOncelikliKuyrukElemanSayisi=0, ucOncelikliKuyrukElemanSayisi=0;
+			ikiOncelikliKuyrukElemanSayisi=0, ucOncelikliKuyrukElemanSayisi=0; 
+	
+	// Oncelik degerlerine gore prosesleri gruplayacagýmýz icin ilgili kuyruk tanýmlamalarý yapýlýyor
 	static public Kuyruk realTimeKuyruk,birOncelikliKuyruk,ikiOncelikliKuyruk,ucOncelikliKuyruk;
-	static public int realTimeKuyrukIlkCount=0;
+
+	// Prosesler arasýnda gecen sureyi bulabilmek icin gerekli iki degisken tanýmlandý bunlar üzerinden
+	// ard arda gelen iki proses arasýndaki sure bulunuyor.
 	static public int ilkWhileOkuduguSatir=0, ikinciWhileOkuduguSatir=0;
-	static public int oncekiGecenSurelerdenEnBuyugu=0;
+
+	// Proseslerin bilgilerini tutabilmek icin gerekli degisken tanýmlamalarý yapýlýyor
 	static public int pid,varisZamani,oncelik,calismaSuresi;
-	static public int ilkVarisinOnceligiKimde;
-	static public int kacinciSatirdayiz;
-	static public boolean ilkCalistirma;
-	public static String txtYolu;
+	
+	static public int ilkVarisinOnceligiKimde; // Ilk calisacak prosesin oncelik degeri kac, o bilgi icin tanýmlama
+	static public int kacinciSatirdayiz; // Hangi satirdaki proses calisiyor onu tutmak icin tanýmlanan degisken
+	static public boolean ilkCalistirma; // ilkCalistiginda hangi oncelik degerine sahip proses calisicak o bilgi icin degisken tanýmlamasý
+	public static String txtYolu; // Parametre olarak args[] dan alýnan txt bilgisi burada saklaniyor
 	
 	public Dispatcher()
 	{
 		
 	}
 	
+	/* Kuyruklarý olusturabilmek icin kac elemanlý olduklarýný bilmemiz gerekiyor. Cunku java'da dizi olustururken
+	 * boyut belirtmek zorundayýz. Bunun icin ilk olarak txt okunuyor ve ilgili degiskenlerin icerigi dolduruluyor. */
 	static void txtIlkOkuma() throws IOException
 	{
 		txtYolu=main.txtYolu;
 		
 		File file = new File(txtYolu);
-		if(!file.exists()) // okunacak dosya var mi
+		if(!file.exists()) // Txt'de okunacak dosya var mi
 		{
-			return;
+			return; // okunacak dosya yoksa return;
 		}
 		
+		/* Dosya okuma yapabilmek icin gerekli tanýmlamalar. */
 		FileReader fReader=new FileReader(file);
 		String line;
 		BufferedReader bReader=new BufferedReader(fReader);
 		
 		while((line=bReader.readLine()) != null) // satir bitene kadar oku
 		{
-			if(line.length()<=0 || line==null || line=="") // satir bos mu
+			if(line.length()<=0 || line==null || line=="") // Satir bos mu
 			{}
-			else
+			else // Eger satir bos degilse
 			{
 				String[] bol=line.split(","); // bol[0]-bol[1]-bol[2] olustu. 
 											  // 0=VarisDegeri, 1=OncelikDegeri, 2=CalismaSuresi
@@ -83,11 +96,11 @@ public class Dispatcher
 		} // while sonu
 		
 		
-		//Ã–ncelik degerleri bir arttigi icin 1'de ki 2'ye geÃ§icek, 2'de ki 3'e geÃ§icek
+		//Oncelik degerleri bir arttigi icin 1'de ki 2'ye geÃ§icek, 2'de ki 3'e gecicek
 		ikiOncelikliKuyrukElemanSayisi=birOncelikliKuyrukElemanSayisi+ikiOncelikliKuyrukElemanSayisi;
 		ucOncelikliKuyrukElemanSayisi=ikiOncelikliKuyrukElemanSayisi+ucOncelikliKuyrukElemanSayisi;
 		
-		//Kuyruklarï¿½ Olusturalï¿½m
+		//Kuyruklarý olusturalým
 		realTimeKuyruk=new Kuyruk(realTimeKuyrukElemanSayisi);
 		birOncelikliKuyruk=new Kuyruk(birOncelikliKuyrukElemanSayisi);
 		ikiOncelikliKuyruk=new Kuyruk(ikiOncelikliKuyrukElemanSayisi);
@@ -96,16 +109,18 @@ public class Dispatcher
 	} // txtIlkOkuma sonu
 	
 	
+	/* Oku fonksiyonu surekli olarak calisacak ve her calistirildiginda bir proses isleme baslayacak. */
 	
-	// Fonksiyon kendini tekrar tekrar cagiracagi icin gerekli parametreler verildi.
+		// Fonksiyon kendini tekrar tekrar cagiracagi icin gerekli parametreler verildi.
 		static void oku(int oVarisZamaninaKadarOku, int kacinciSatirdaKaldik) throws IOException
 		{
 			//Satir satir kontrol edip hangi kuyruga atanmasi gerekiyor o islemler gerceklestiriliyor.
-			//Satiri ayirarak degiskenlere atÄ±yoruz
+			//Satiri ayirarak degiskenlere atýyoruz.
 			File file = new File(txtYolu);
 			if(!file.exists()) // Okunacak dosya var mi, kontrol ediliyor
 			{return;}
 			
+			/* Dosya okuma islemi yapabilmek icin gerekli degiskenler tanýmlanýyor ve icerikleri dolduruluyor. */
 			FileReader fReader=new FileReader(file);
 			String line;
 			BufferedReader bReader=new BufferedReader(fReader);
@@ -115,35 +130,24 @@ public class Dispatcher
 			BufferedReader bReader2=new BufferedReader(fReader2);
 			
 			int i=0;
-			ilkWhileOkuduguSatir=0; // Oku fonksiyonu cagirildiginda sifirlanmasi gerekir.
+			ilkWhileOkuduguSatir=0; // Oku fonksiyonu her cagirildiginda sifirlanmasi gerekir.
 			while((line=bReader.readLine()) != null) // satir bitene kadar oku
 			{
-				//System.out.println(toplamSatirSayisi);
-				/* Txt indisi 0 dan basliyor.
-				if(i==3)
-				{
-					String[] bol=line.split(","); // bol[0],bol[1],bol[2]
-					pid=i;
-					varisZamani=Integer.parseInt(bol[0]);
-					oncelik=Integer.parseInt(bol[1]);
-					calismaSuresi=Integer.parseInt(bol[2]);
-					System.out.println(varisZamani+","+oncelik+","+calismaSuresi);
-				}*/
-				if(line.length()<=0 || line==null || line=="") // satir bos mu
+				if(line.length()<=0 || line==null || line=="") // Okunan satir bos mu
 				{}
-				else // satir bos degilse
+				else // Okunan satir bos degilse
 				{
 					if(i==kacinciSatirdaKaldik && i!=0) // kaldigimiz satiri bul
 					{
 						/* O satirdaki prosesin bilgilerini aliyoruz ve bir sonraki satirdaki ile karsilastiricaz.*/
-						String[] bol=line.split(","); // bol[0],bol[1],bol[2]
+						String[] bol=line.split(","); // bol[0],bol[1],bol[2] olarak 3 adet deger return ediyor.
 						pid=i;
 						varisZamani=Integer.parseInt(bol[0]);
 						oncelik=Integer.parseInt(bol[1]);
 						calismaSuresi=Integer.parseInt(bol[2]);
 						
 						/* Bir sonraki satirin varisZamanina bakiyoruz. 
-						 * Eger gecenSure'den dusukse gecenSure=oSatÄ±rÄ±nVarÄ±sZamanÄ± dememiz gerekiyor.*/
+						 * Eger gecenSure'den dusukse gecenSure=oSatirinVarisZamani dememiz gerekiyor.*/
 						while((line2=bReader2.readLine()) != null) //satirBiteneKadarOku
 						{
 							
@@ -161,10 +165,8 @@ public class Dispatcher
 								
 								else
 								{
-									
 									if(ikinciWhileOkuduguSatir==(ilkWhileOkuduguSatir+1))
 									{
-										
 										String[] bol2=line2.split(","); // bol[0],bol[1],bol[2]
 										int varisZamani2,oncelik2,calismaSuresi2;
 										varisZamani2=Integer.parseInt(bol2[0]);
@@ -173,14 +175,10 @@ public class Dispatcher
 										
 										int i0baslangicDegeri=varisZamani;
 										int i1baslangicDegeri=varisZamani2;
-										//System.out.print("k:"+i1baslangicDegeri+"-"+i0baslangicDegeri+"|");
-										if(i1baslangicDegeri>i0baslangicDegeri) // o zaman sure desimeliydi
+										if(i1baslangicDegeri>i0baslangicDegeri) // o zaman gecenSure degismeli
 										{
-											//System.out.print("k:"+i1baslangicDegeri+"-"+i0baslangicDegeri+"|");
-
 											if(calismaSuresi<(varisZamani2-gecenSure)) {break;}
 											gecenSure=i1baslangicDegeri;
-											//System.out.print("k:"+gecenSure);
 										}
 										else // ilk prosesin toplamHarcadigiSure daha buyuk
 										{}
@@ -194,7 +192,6 @@ public class Dispatcher
 					} //i==kacinciSatirdaKaldik && i!=0		
 					else if(i==kacinciSatirdaKaldik && i==0 && varisZamani<=gecenSure)
 					{
-						
 						// i==0 icin(ilk proses icin kontrol)
 						// Proses olusturulup ilgili kuyruga ekleniyor.
 						String[] bol=line.split(","); // bol[0],bol[1],bol[2]
@@ -205,7 +202,6 @@ public class Dispatcher
 						
 						Proses proses=new Proses(pid, varisZamani, oncelik, calismaSuresi,Status.ready,Renkler.renk[i%7]);
 						kacinciSatirdaKaldik=i+1;
-						//System.out.println("noldu");
 						if(oncelik==0)
 						{
 							if(realTimeKuyrukElemanSayisi!=0) // realtimeKuyruk'a eklenecek satir varsa
@@ -267,14 +263,15 @@ public class Dispatcher
 			
 			/*________________ Proses kuyruguna gore Kuyruk Islemleri Yapiliyor.. _______________*/
 			
+			/* ilgili class'lardan nesneler olusturuluyor. */
 			RealTimeKuyrukClass realTimeKuyrukClass=new RealTimeKuyrukClass();
 			BirOncelikliKuyrukClass birOncelikliKuyrukClass=new BirOncelikliKuyrukClass();
 			IkiOncelikliKuyrukClass ikiOncelikliKuyrukClass=new IkiOncelikliKuyrukClass();
 			UcOncelikliKuyrukClass ucOncelikliKuyrukClass=new UcOncelikliKuyrukClass();
 			
-			//if(kacinciSatirdaKaldik==0)
-			if(ilkCalistirma==true)
+			if(ilkCalistirma==true) // Ilk okuma islemi mi yapýlýyor, yani ilk proses mi isleme girecek buna bakýyoruz
 			{
+				/* Hangi oncelik degerine sahip proses ise o islemler yapýlacagý icin ilgili kontroller yapiliyor. */
 				if(ilkVarisinOnceligiKimde==0)
 				{
 					realTimeKuyrukClass.sifirOncelikFonksiyon();
@@ -290,11 +287,10 @@ public class Dispatcher
 				else if(ilkVarisinOnceligiKimde==3)
 				{
 					ucOncelikliKuyrukClass.ucOncelikFonksiyon();
-					//System.out.println("burda");
 				}
 				ilkCalistirma=false;
 			}
-			else 
+			else // ilk satýr degil, diger satýrdaki prosesler islemini yapýyor ise
 			{
 				if(!realTimeKuyruk.kuyruktaOkunacakElemanVarmi())
 					realTimeKuyrukClass.sifirOncelikFonksiyon();

@@ -6,31 +6,34 @@ import isletimSistemleriProje.Proses.Status;
 
 public class RealTimeKuyrukClass 
 {
-	public Kuyruk realTimeKuyruk;
+	public Kuyruk realTimeKuyruk; // ilgili kuyruk degiskeni tan�mlamas�
 
+	// Constructor
 	public RealTimeKuyrukClass()
 	{}
+	
+	// Bu class'tan nesne olusturuldugunda yapabilecegi fonksiyon tan�mlaniyor
 	
 	public void sifirOncelikFonksiyon() throws IOException
 	{
 		realTimeKuyruk=Dispatcher.realTimeKuyruk;
 		
 		/* realTimeKuyruk islemi */
-		for(int j=0; j<realTimeKuyruk.count(); j++)
+		for(int j=0; j<realTimeKuyruk.count(); j++) // realTimeKuyrugunda bulunan proses say�s� kadar calisiyor.
 		{
 			if(realTimeKuyruk.indexOf(j).calismaSuresi==0) // calismaSuresi=0 ise proses olmemistirr(isini bitirmistir)
 			{}
 			else // proses bitmemis ise (hala yasiyorsa)
 			{
-				// Eğer proses olustugundan itibaren 20 saniye geçtiyse kendi kendine olecek
+				// Eger proses olustugundan itibaren 20 saniye gectiyse kendi kendine olecek
 				if((Dispatcher.gecenSure-realTimeKuyruk.indexOf(j).varisZamani)>=20)
 				{
-					// proses zaten ölmüş mü ölmemiş mi bakalım
-					if(realTimeKuyruk.indexOf(j).durum==Status.killed) // zaten ölmüşse bir şey yapma
+					// proses zaten olmus mu, olmemis mi kontrolu yapiliyor
+					if(realTimeKuyruk.indexOf(j).durum==Status.killed) // Proses zaten olmus ise bir sey yapma
 					{}
-					else // ölmemiş ise ölsün
+					else // Proses olmemis ise oldur.
 					{
-						// Biz bu öldürme işlemini degerlerini 0'layarak belirtiyoruz.
+						// Biz bu proses oldurme islemini degerlerini 0'layarak belirtiyoruz ve killProses metodunu cagirarak yapiyoruz.
 						realTimeKuyruk.indexOf(j).varisZamani=0;
 						realTimeKuyruk.indexOf(j).oncelik=0;
 						realTimeKuyruk.indexOf(j).calismaSuresi=0;
@@ -58,7 +61,7 @@ public class RealTimeKuyrukClass
 					realTimeKuyruk.indexOf(j).calismaSuresi=0;
 					realTimeKuyruk.indexOf(j).terminatedProses();
 					
-					//Tekrar Txt'den okuma islemi yapsın ve diğer satirlari okuyarak process islemine devam etsin.
+					//Tekrar Txt'den okuma islemi yapsin ve diger satirlari okuyarak process islemine devam etsin.
 					Dispatcher.oku(Dispatcher.gecenSure, Dispatcher.kacinciSatirdayiz);
 				} // else sonu(20 saniye geçti mi)
 			} // else sonu
@@ -66,8 +69,5 @@ public class RealTimeKuyrukClass
 		/* realTimeKuyruk islemi bitti*/
 		
 	}
-
-	
-	
 	
 }//class sonu

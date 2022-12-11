@@ -6,57 +6,62 @@ import isletimSistemleriProje.Proses.Status;
 
 public class BirOncelikliKuyrukClass 
 {
+	// Kuyruk tan�mlamalar� yap�l�yor, 
+	// birOncelikliKuyruk 1 saniye calistiktan sonra, oncelik degeri dusurulecegi icin 2 oncelikli kuyruk tan�mlamasi da yapiliyor.
 	public Kuyruk birOncelikliKuyruk,ikiOncelikliKuyruk;
-	
+
+	// constructor
 	public BirOncelikliKuyrukClass()
 	{
 		
 	}
 	
+	// Bu class'�n yapacag� islem(metod)
 	public  void birOncelikFonksiyon() throws IOException 
 	{
 		birOncelikliKuyruk=Dispatcher.birOncelikliKuyruk;
 		ikiOncelikliKuyruk=Dispatcher.ikiOncelikliKuyruk;
 		
-		/* birOncelikliKuyruk işlemi */
+		/* birOncelikliKuyruk islemi */
 		for(int p=0; p<birOncelikliKuyruk.count(); p++)
 		{
-			// Eğer proses oluştuğundan itibaren 20 saniye geçtiyse kendi kendine ölüyor
-			if((Dispatcher.gecenSure-birOncelikliKuyruk.indexOf(p).enSonCalistigiZaman)>=20)
+			// Eger proses olustugundan itibaren 20 saniye gectiyse kendi kendine oluyor
+			//if((Dispatcher.gecenSure-birOncelikliKuyruk.indexOf(p).enSonCalistigiZaman)>=20)
+			if((Dispatcher.gecenSure-birOncelikliKuyruk.indexOf(p).varisZamani)>=20)
 			{
-				// proses zaten ölmüş mü ölmemiş mi bakalım
-				if(birOncelikliKuyruk.indexOf(p).durum==Status.killed) // zaten ölmüşse bir şey yapma
+				// proses zaten olmus mu olmemis mi bakalim
+				if(birOncelikliKuyruk.indexOf(p).durum==Status.killed) // zaten olmus ise bir sey yapma
 				{}
-				else // ölmemiş ise ölsün
+				else // olmemis ise olsun
 				{
-					// Biz bu öldürme işlemini degerlerini 0'layarak belirtiyoruz.
+					// Biz bu oldurme islemini degerlerini 0'layarak belirtiyoruz.
 					birOncelikliKuyruk.indexOf(p).varisZamani=0;
 					birOncelikliKuyruk.indexOf(p).oncelik=0;
 					birOncelikliKuyruk.indexOf(p).calismaSuresi=0;
 					birOncelikliKuyruk.indexOf(p).killProses();
-					//oku(gecenSure,(kacinciSatirdaKaldik+1));
 				}
 			}
-			else
+			else // Eger proses olustuktan itibaren 20 saniye olmad�ysa
 			{
-				if(birOncelikliKuyruk.indexOf(p).calismaSuresi==0 && birOncelikliKuyruk.indexOf(p).durum==Status.killed) // calismaSuresi=0 ise proses işlemini bitirmiştir ()
+				// calismaSuresi=0 ise proses islemini bitirmistir(olmustur)
+				if(birOncelikliKuyruk.indexOf(p).calismaSuresi==0 && birOncelikliKuyruk.indexOf(p).durum==Status.killed)
 				{}
-				else if(birOncelikliKuyruk.indexOf(p).calismaSuresi==1) //gelen proses 1 saniyelik calisma zamanına sahipse calisir ve ölür 
+				else if(birOncelikliKuyruk.indexOf(p).calismaSuresi==1)  //gelen proses 1 saniyelik calisma zmaan�na sahipse calisir ve olur 
 				{
-					if(birOncelikliKuyruk.indexOf(p).durum==Status.waiting) //eger askiya alinmiş ve bir saniyesi kalmış ise bir şey yapma
+					if(birOncelikliKuyruk.indexOf(p).durum==Status.waiting) //eger askiya alinmis ve bir saniyesi kalmis ise bir sey yapma
 					{}
-					else // proses yeni gelmiş ve bir saniyelik çalışma süresi varsa çalış ve öldür
+					else // proses yeni gelmis ve bir saniyelik calismaSuresi varsa calistir ve oldur
 					{
 						//Proses calismaya basladi // (1saniye)
 						birOncelikliKuyruk.indexOf(p).startProses(); 
 						Dispatcher.gecenSure+=1;
 						
-						// Eger proses birOncelikliKuyruk ise bir saniye çalışır ve ölür.
+						// Eger proses birOncelikliKuyruk ise bir saniye calistir ve oldur.
 						int prosesId=birOncelikliKuyruk.indexOf(p).prosesId;
 						int prosesinCalismaSuresi=birOncelikliKuyruk.indexOf(p).calismaSuresi;
 						birOncelikliKuyruk.indexOf(p).ProsesCalistir(prosesId, prosesinCalismaSuresi,Dispatcher.gecenSure);
 						
-						// Proses ölür
+						// Prosesi oldur
 						birOncelikliKuyruk.indexOf(p).varisZamani=0;
 						birOncelikliKuyruk.indexOf(p).oncelik=0;
 						birOncelikliKuyruk.indexOf(p).calismaSuresi=0;
@@ -67,20 +72,17 @@ public class BirOncelikliKuyrukClass
 						
 					}
 				}
-				else if(birOncelikliKuyruk.indexOf(p).durum==Status.waiting) //proses askıya alınmışsa
+				else if(birOncelikliKuyruk.indexOf(p).durum==Status.waiting) //proses askiya alinmissa
 				{
-					//oncelik degeri arttırılmıştır, bir işlem yapma
-					//Tekrar Txt'den okuma islemi yap
-					//oku(oVarisZamaninaKadarOku, kacinciSatirdaKaldik) => oku bunları alıyor
-					//oku(gecenSure,kacinciSatirdaKaldik);
+					//oncelik degeri arttirildi, bir islem yapma
 				}
-				else // proses bitmemiş ise (hala yaşıyorsa ve askıda degilse)
+				else // proses bitmemis ise (hala yasiyorsa ve askida degilse)
 				{
 					//Proses calismaya basladi
 					birOncelikliKuyruk.indexOf(p).startProses(); 
 					Dispatcher.gecenSure+=1;
 					
-					// Eger proses birOncelikliKuyruk ise bir saniye çalışır,askıya alınır ve ikiOncelikliKuyruk'a eklenir.
+					// Eger proses birOncelikliKuyrukta ise bir saniye calistirilir ,askiya alinir ve ikiOncelikliKuyruk'a eklenir.
 					int prosesId=birOncelikliKuyruk.indexOf(p).prosesId;
 					int prosesinCalismaSuresi=birOncelikliKuyruk.indexOf(p).calismaSuresi;
 					birOncelikliKuyruk.indexOf(p).ProsesCalistir(prosesId, prosesinCalismaSuresi,Dispatcher.gecenSure);
@@ -90,22 +92,20 @@ public class BirOncelikliKuyrukClass
 					Status durum=Status.ready;
 					String renk=birOncelikliKuyruk.indexOf(p).renk;
 					int kalanCalismaSuresi=birOncelikliKuyruk.indexOf(p).calismaSuresi;
-					//System.out.println("kalanCalismaSuresi: "+kalanCalismaSuresi);
+					
 					Proses proses=new Proses(prosesId,varisZamani,oncelik,kalanCalismaSuresi,durum,renk);
 					proses.enSonCalistigiZaman=Dispatcher.gecenSure;
-					ikiOncelikliKuyruk.insert(proses); // iki öncelikliye eklendi
+					ikiOncelikliKuyruk.insert(proses); // iki oncelikliye eklendi
 					
-					//Prosesi askıya al
+					//Prosesi askiya al
 					birOncelikliKuyruk.indexOf(p).prosesAskiyaAlindi();
 					
-					//System.out.println(birOncelikliKuyruk.indexOf(p).calismaSuresi);
 					//Tekrar Txt'den okuma islemi yap
 					Dispatcher.oku(Dispatcher.gecenSure,Dispatcher.kacinciSatirdayiz);
-					//oku(gecenSure+1,kacinciSatirdaKaldik);
 					
-				} // else sonu (proses bitmemiş ise)
+				} // else sonu (proses bitmemis(olmemis) ise)
 			}
 		} // for sonu
-		/* birOncelikliKuyruk işlemi bitti */
+		/* birOncelikliKuyruk islemi bitti */
 	}
 }

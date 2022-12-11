@@ -10,6 +10,7 @@ public class main
 
 	public static void main(String[] args) throws IOException
 	{
+		// Dosyayý jar olarak calistirdigimiz icin parametrenin args[] olarak girilip girilmediðini kontrol ediyoruz.
 		if(args.length<=0) // Eger bir parametre girmezse
 		{}
 		else
