@@ -15,7 +15,7 @@ public class UcOncelikliKuyrukClass
 	}
 	
 	// Bu class'tan nesne olusturuldugunda bir metod cagirilacagi icin bu metod tanimlaniyor
-	public void ucOncelikFonksiyon() throws IOException
+	public void ucOncelikFonksiyon() throws IOException, InterruptedException
 	{
 		ucOncelikliKuyruk=Dispatcher.ucOncelikliKuyruk;
 		
@@ -32,46 +32,50 @@ public class UcOncelikliKuyrukClass
 				{
 					// Biz bu oldurme islemini degerlerini 0'layarak belirtiyoruz.
 					ucOncelikliKuyruk.indexOf(s).varisZamani=0;
-					ucOncelikliKuyruk.indexOf(s).oncelik=0;
+					//ucOncelikliKuyruk.indexOf(s).oncelik=0;
 					ucOncelikliKuyruk.indexOf(s).calismaSuresi=0;
-					ucOncelikliKuyruk.indexOf(s).killProses();
+					ucOncelikliKuyruk.indexOf(s).killProses(Dispatcher.sayac);
 				}
 			}
 			else // Eger proses olustuktan itibaren 20 saniye olmadiysa, islemlerini gerceklestirsin
 			{
-				if(ucOncelikliKuyruk.indexOf(s).calismaSuresi==0 && ucOncelikliKuyruk.indexOf(s).durum==Status.killed) // calismaSuresi=0 ise proses islemini bitirmistir(olmustur)
+				if(ucOncelikliKuyruk.indexOf(s).calismaSuresi==0 || ucOncelikliKuyruk.indexOf(s).durum==Status.killed) // calismaSuresi=0 ise proses islemini bitirmistir(olmustur)
 				{} // proses olmustur
 				else if(ucOncelikliKuyruk.indexOf(s).calismaSuresi==1) //gelen proses 1 saniyelik calisma zamanina sahipse calisir ve olur
 				{
 						//Proses calismaya basladi // (1saniye)
-						ucOncelikliKuyruk.indexOf(s).startProses(); 
-						
+						ucOncelikliKuyruk.indexOf(s).startProses(Dispatcher.sayac); 
+						Dispatcher.sayac+=1;
 						int prosesId=ucOncelikliKuyruk.indexOf(s).prosesId;
 						int prosesinCalismaSuresi=ucOncelikliKuyruk.indexOf(s).calismaSuresi;
-						ucOncelikliKuyruk.indexOf(s).ProsesCalistir(prosesId, prosesinCalismaSuresi,Dispatcher.gecenSure);
+						//ucOncelikliKuyruk.indexOf(s).ProsesCalistir(prosesId, prosesinCalismaSuresi,Dispatcher.sayac);
 						
 						// Proses olsun
 						ucOncelikliKuyruk.indexOf(s).varisZamani=0;
-						ucOncelikliKuyruk.indexOf(s).oncelik=0;
+						//ucOncelikliKuyruk.indexOf(s).oncelik=0;
 						ucOncelikliKuyruk.indexOf(s).calismaSuresi=0;
-						ucOncelikliKuyruk.indexOf(s).terminatedProses();
+						ucOncelikliKuyruk.indexOf(s).terminatedProses(Dispatcher.sayac);
 						
 						Dispatcher.gecenSure+=1;
+						
 						//Tekrar Txt'den okuma islemi yap
 						Dispatcher.oku(Dispatcher.gecenSure,Dispatcher.kacinciSatirdayiz);
 				}
 				else // proses bitmemis ise (hala yasiyorsa(olmediyse))
 				{
 					//Proses calismaya basladi
-					ucOncelikliKuyruk.indexOf(s).startProses(); 
+					ucOncelikliKuyruk.indexOf(s).calismaSuresi-=1;
+					ucOncelikliKuyruk.indexOf(s).startProses(Dispatcher.sayac); 
+					Dispatcher.sayac+=1;
+					ucOncelikliKuyruk.indexOf(s).calismaSuresi-=1;
 					
 					// Bir saniye calistir ve askiya al
 					int prosesId=ucOncelikliKuyruk.indexOf(s).prosesId;
 					int prosesinCalismaSuresi=ucOncelikliKuyruk.indexOf(s).calismaSuresi;
-					ucOncelikliKuyruk.indexOf(s).ProsesCalistir(prosesId, prosesinCalismaSuresi,Dispatcher.gecenSure);
+					//ucOncelikliKuyruk.indexOf(s).ProsesCalistir(prosesId, prosesinCalismaSuresi,Dispatcher.sayac);
 					
 					//Prosesi askıya al
-					ucOncelikliKuyruk.indexOf(s).prosesAskiyaAlindi();
+					ucOncelikliKuyruk.indexOf(s).prosesAskiyaAlindi(Dispatcher.sayac,prosesinCalismaSuresi,3);
 					
 					Dispatcher.gecenSure+=1;
 					ucOncelikliKuyruk.prosesKaydir(s);

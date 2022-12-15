@@ -7,10 +7,25 @@ import java.io.IOException;
 
 import isletimSistemleriProje.Proses.Status;
 
+/*
+ * 			  		  SAKARYA UNIVERSITESI 
+ * 				BILGISAYAR MUHENDISLIGI BOLUMU 
+ * 		  	 	 	ISLETIM SISTEMLERI DERSI
+ *  				 	 PROJE ODEVI
+ * 					 	 DISTPATCHER
+ * 
+ * 
+ * 			OGRENCILER: MEHMET YUKSEL    B211210305
+ * 			  			RESUL  CALISKAN  B191210002
+ * 
+ * 
+ * */
+
 public class Dispatcher
 {
 	/*Gerekli degisken tanýmlamalarý yapýlýyor.*/
-	
+	static public int sayac=0;
+
 	static public int toplamSatirSayisi=0; // Txt'de bulunan toplam satir sayýsý
 	static public int ilkVaris=0; // Txt'de bulunan ilk prosesin varisSuresi tutuluyor
  	static public int gecenSure=0;  // Proseslerin calistiklarý surelerin toplamý tutuluyor
@@ -35,16 +50,16 @@ public class Dispatcher
 	static public boolean ilkCalistirma; // ilkCalistiginda hangi oncelik degerine sahip proses calisicak o bilgi icin degisken tanýmlamasý
 	public static String txtYolu; // Parametre olarak args[] dan alýnan txt bilgisi burada saklaniyor
 	
-	public Dispatcher()
+	public Dispatcher(String _txt)
 	{
-		
+		txtYolu=_txt;
 	}
 	
 	/* Kuyruklarý olusturabilmek icin kac elemanlý olduklarýný bilmemiz gerekiyor. Cunku java'da dizi olustururken
 	 * boyut belirtmek zorundayýz. Bunun icin ilk olarak txt okunuyor ve ilgili degiskenlerin icerigi dolduruluyor. */
 	static void txtIlkOkuma() throws IOException
 	{
-		txtYolu=main.txtYolu;
+		//txtYolu=main.txtYolu;
 		
 		File file = new File(txtYolu);
 		if(!file.exists()) // Txt'de okunacak dosya var mi
@@ -68,26 +83,26 @@ public class Dispatcher
 				// ilkVaris Degerini aliyoruz
 				if(toplamSatirSayisi==0) // ilk satir ise
 				{
-					ilkVaris=Integer.parseInt(bol[0]);
-					ilkVarisinOnceligiKimde=Integer.parseInt(bol[1]);
+					ilkVaris=Integer.parseInt(bol[0].trim());
+					ilkVarisinOnceligiKimde=Integer.parseInt(bol[1].trim());
 					gecenSure=ilkVaris;
 				}
 				
 				//RealTimeKuyruk'a atanacak kac adet satir var onun sayisini bulalim
 				// javada dizi uzunlugu belirtilmek zorunda
-				if(Integer.parseInt(bol[1])==0)
+				if(Integer.parseInt(bol[1].trim())==0)
 					realTimeKuyrukElemanSayisi++;
 				
 				//birOncelikliKuyruk'a atanacak kac adet satir var onun sayisini bulalim
-				if(Integer.parseInt(bol[1])==1)
+				if(Integer.parseInt(bol[1].trim())==1)
 					birOncelikliKuyrukElemanSayisi++;
 				
 				//ikiOncelikliKuyruk'a atanacak kac adet satir var onun sayisini bulalim
-				if(Integer.parseInt(bol[1])==2)
+				if(Integer.parseInt(bol[1].trim())==2)
 					ikiOncelikliKuyrukElemanSayisi++;
 				
 				//ucOncelikliKuyruk'a atanacak kac adet satir var onun sayisini bulalim
-				if(Integer.parseInt(bol[1])==3)
+				if(Integer.parseInt(bol[1].trim())==3)
 					ucOncelikliKuyrukElemanSayisi++;		
 			} // else sonu
 			
@@ -112,7 +127,7 @@ public class Dispatcher
 	/* Oku fonksiyonu surekli olarak calisacak ve her calistirildiginda bir proses isleme baslayacak. */
 	
 		// Fonksiyon kendini tekrar tekrar cagiracagi icin gerekli parametreler verildi.
-		static void oku(int oVarisZamaninaKadarOku, int kacinciSatirdaKaldik) throws IOException
+		static void oku(int oVarisZamaninaKadarOku, int kacinciSatirdaKaldik) throws IOException, InterruptedException
 		{
 			//Satir satir kontrol edip hangi kuyruga atanmasi gerekiyor o islemler gerceklestiriliyor.
 			//Satiri ayirarak degiskenlere atýyoruz.
@@ -142,9 +157,9 @@ public class Dispatcher
 						/* O satirdaki prosesin bilgilerini aliyoruz ve bir sonraki satirdaki ile karsilastiricaz.*/
 						String[] bol=line.split(","); // bol[0],bol[1],bol[2] olarak 3 adet deger return ediyor.
 						pid=i;
-						varisZamani=Integer.parseInt(bol[0]);
-						oncelik=Integer.parseInt(bol[1]);
-						calismaSuresi=Integer.parseInt(bol[2]);
+						varisZamani=Integer.parseInt(bol[0].trim());
+						oncelik=Integer.parseInt(bol[1].trim());
+						calismaSuresi=Integer.parseInt(bol[2].trim());
 						
 						/* Bir sonraki satirin varisZamanina bakiyoruz. 
 						 * Eger gecenSure'den dusukse gecenSure=oSatirinVarisZamani dememiz gerekiyor.*/
@@ -169,9 +184,9 @@ public class Dispatcher
 									{
 										String[] bol2=line2.split(","); // bol[0],bol[1],bol[2]
 										int varisZamani2,oncelik2,calismaSuresi2;
-										varisZamani2=Integer.parseInt(bol2[0]);
-										oncelik2=Integer.parseInt(bol2[1]);
-										calismaSuresi2=Integer.parseInt(bol2[2]);
+										varisZamani2=Integer.parseInt(bol2[0].trim());
+										oncelik2=Integer.parseInt(bol2[1].trim());
+										calismaSuresi2=Integer.parseInt(bol2[2].trim());
 										
 										int i0baslangicDegeri=varisZamani;
 										int i1baslangicDegeri=varisZamani2;
@@ -196,11 +211,11 @@ public class Dispatcher
 						// Proses olusturulup ilgili kuyruga ekleniyor.
 						String[] bol=line.split(","); // bol[0],bol[1],bol[2]
 						pid=i;
-						varisZamani=Integer.parseInt(bol[0]);
-						oncelik=Integer.parseInt(bol[1]);
-						calismaSuresi=Integer.parseInt(bol[2]);
+						varisZamani=Integer.parseInt(bol[0].trim());
+						oncelik=Integer.parseInt(bol[1].trim());
+						calismaSuresi=Integer.parseInt(bol[2].trim());
 						
-						Proses proses=new Proses(pid, varisZamani, oncelik, calismaSuresi,Status.ready,Renkler.renk[i%7]);
+						Proses proses=new Proses(pid, sayac,varisZamani, oncelik, calismaSuresi,Status.ready,Renkler.renk[i%7]);
 						kacinciSatirdaKaldik=i+1;
 						if(oncelik==0)
 						{
@@ -229,8 +244,9 @@ public class Dispatcher
 					{
 						
 						// Proses olusturulup ilgili kuyruga ekleniyor.
+						//System.out.print("s:"+sayac);
+						Proses proses=new Proses(pid, sayac,varisZamani, oncelik, calismaSuresi,Status.ready,Renkler.renk[i%7]);
 						
-						Proses proses=new Proses(pid, varisZamani, oncelik, calismaSuresi,Status.ready,Renkler.renk[i%7]);
 						kacinciSatirdaKaldik=i+1;
 						if(oncelik==0)
 						{

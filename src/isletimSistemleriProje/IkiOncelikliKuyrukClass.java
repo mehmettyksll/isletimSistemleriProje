@@ -17,7 +17,7 @@ public class IkiOncelikliKuyrukClass
 	}
 	
 	// Bu class'ýn yapacagý islem(metod)
-	public void ikiOncelikFonksiyon() throws IOException 
+	public void ikiOncelikFonksiyon() throws IOException, InterruptedException 
 	{
 		ikiOncelikliKuyruk=Dispatcher.ikiOncelikliKuyruk;
 		ucOncelikliKuyruk=Dispatcher.ucOncelikliKuyruk;
@@ -32,13 +32,15 @@ public class IkiOncelikliKuyrukClass
 				// proses zaten olmus mu olmemis mi bakalim
 				if(ikiOncelikliKuyruk.indexOf(r).durum==Status.killed) // zaten olmus ise bir sey yapma
 				{}
+				else if(ikiOncelikliKuyruk.indexOf(r).durum==Status.waiting) // askýya alinmissa artik bu kuyrukta degildir(ucOncelikliKuyruk'a gecmistir)
+				{}
 				else // olmemis ise olsun
 				{
 					// Biz bu oldurme islemini degerlerini 0'layarak belirtiyoruz.
 					ikiOncelikliKuyruk.indexOf(r).varisZamani=0;
-					ikiOncelikliKuyruk.indexOf(r).oncelik=0;
+					//ikiOncelikliKuyruk.indexOf(r).oncelik=0;
 					ikiOncelikliKuyruk.indexOf(r).calismaSuresi=0;
-					ikiOncelikliKuyruk.indexOf(r).killProses();
+					ikiOncelikliKuyruk.indexOf(r).killProses(Dispatcher.sayac);
 				}
 			}
 			else // Eger proses olustuktan itibaren 20 saniye olmadýysa
@@ -53,19 +55,19 @@ public class IkiOncelikliKuyrukClass
 					else // proses yeni gelmis ve bir saniyelik calismaSuresi varsa calistir ve oldur
 					{
 						//Proses calismaya basladi // (1saniye)
-						ikiOncelikliKuyruk.indexOf(r).startProses(); 
+						ikiOncelikliKuyruk.indexOf(r).startProses(Dispatcher.sayac); 
 						Dispatcher.gecenSure+=1;
-						
+						//ikiOncelikliKuyruk.indexOf(r).calismaSuresi-=1;
 						// Eger proses ikiOncelikliKuyruk ise bir saniye calistir ve oldur.
 						int prosesId=ikiOncelikliKuyruk.indexOf(r).prosesId;
 						int prosesinCalismaSuresi=ikiOncelikliKuyruk.indexOf(r).calismaSuresi;
-						ikiOncelikliKuyruk.indexOf(r).ProsesCalistir(prosesId, prosesinCalismaSuresi,Dispatcher.gecenSure);
+						//ikiOncelikliKuyruk.indexOf(r).ProsesCalistir(prosesId, prosesinCalismaSuresi,Dispatcher.sayac);
 						
 						// Proses olsun
 						ikiOncelikliKuyruk.indexOf(r).varisZamani=0;
-						ikiOncelikliKuyruk.indexOf(r).oncelik=0;
+						//ikiOncelikliKuyruk.indexOf(r).oncelik=0;
 						ikiOncelikliKuyruk.indexOf(r).calismaSuresi=0;
-						ikiOncelikliKuyruk.indexOf(r).terminatedProses();
+						ikiOncelikliKuyruk.indexOf(r).terminatedProses(Dispatcher.sayac);
 						
 						//Tekrar Txt'den okuma islemi yap
 						Dispatcher.oku(Dispatcher.gecenSure,Dispatcher.kacinciSatirdayiz);
@@ -78,25 +80,30 @@ public class IkiOncelikliKuyrukClass
 				else // proses bitmemis ise (hala yasiyorsa ve askida degilse)
 				{
 					//Proses calismaya basladi
-					ikiOncelikliKuyruk.indexOf(r).startProses(); 
+					ikiOncelikliKuyruk.indexOf(r).calismaSuresi-=1;
+					ikiOncelikliKuyruk.indexOf(r).startProses(Dispatcher.sayac); 
 					Dispatcher.gecenSure+=1;
-					
+					ikiOncelikliKuyruk.indexOf(r).calismaSuresi-=1;
 					// Eger proses ikiOncelikliKuyruk ise bir saniye calistirilir ,askiya alinir ve ucOncelikliKuyruk'a eklenir.
 					int prosesId=ikiOncelikliKuyruk.indexOf(r).prosesId;
 					int prosesinCalismaSuresi=ikiOncelikliKuyruk.indexOf(r).calismaSuresi;
-					ikiOncelikliKuyruk.indexOf(r).ProsesCalistir(prosesId, prosesinCalismaSuresi,Dispatcher.gecenSure);
+					//ikiOncelikliKuyruk.indexOf(r).ProsesCalistir(prosesId, prosesinCalismaSuresi,Dispatcher.sayac);
+					
 					int varisZamani=ikiOncelikliKuyruk.indexOf(r).varisZamani;
 					int oncelik=3;
 					Status durum=Status.ready;
 					String renk=ikiOncelikliKuyruk.indexOf(r).renk;
 					int kalanCalismaSuresi=ikiOncelikliKuyruk.indexOf(r).calismaSuresi;
-					Proses proses=new Proses(prosesId,varisZamani,oncelik,kalanCalismaSuresi,durum,renk);
+					Proses proses=new Proses(prosesId,Dispatcher.gecenSure,varisZamani,oncelik,kalanCalismaSuresi,durum,renk);
 					proses.enSonCalistigiZaman=Dispatcher.gecenSure;
 					ucOncelikliKuyruk.insert(proses); // ucOncelikliKuyruk'a eklendi
 					
 					//Prosesi askiya alindi
-					ikiOncelikliKuyruk.indexOf(r).prosesAskiyaAlindi();
-					
+					ikiOncelikliKuyruk.indexOf(r).prosesAskiyaAlindi(Dispatcher.sayac,kalanCalismaSuresi,oncelik);
+					ikiOncelikliKuyruk.indexOf(r).varisZamani=0;
+					//ikiOncelikliKuyruk.indexOf(r).oncelik=0;
+					ikiOncelikliKuyruk.indexOf(r).calismaSuresi=0;
+					ikiOncelikliKuyruk.indexOf(r).durum=Status.killed;
 					//Tekrar Txt'den okuma islemi yap
 					Dispatcher.oku(Dispatcher.gecenSure,Dispatcher.kacinciSatirdayiz);
 					

@@ -14,7 +14,7 @@ public class RealTimeKuyrukClass
 	
 	// Bu class'tan nesne olusturuldugunda yapabilecegi fonksiyon tanýmlaniyor
 	
-	public void sifirOncelikFonksiyon() throws IOException
+	public void sifirOncelikFonksiyon() throws IOException, InterruptedException
 	{
 		realTimeKuyruk=Dispatcher.realTimeKuyruk;
 		
@@ -37,29 +37,34 @@ public class RealTimeKuyrukClass
 						realTimeKuyruk.indexOf(j).varisZamani=0;
 						realTimeKuyruk.indexOf(j).oncelik=0;
 						realTimeKuyruk.indexOf(j).calismaSuresi=0;
-						realTimeKuyruk.indexOf(j).killProses();
+						realTimeKuyruk.indexOf(j).killProses(Dispatcher.gecenSure);
 					}
 				}
 				else
 				{
-					realTimeKuyruk.indexOf(j).startProses();
+					realTimeKuyruk.indexOf(j).startProses(Dispatcher.sayac);
 					//bu kismida gecen sureyi zaten yukarida degistirdigimiz icin artik direkt gecenSure + calismaZamani dedim
 					Dispatcher.gecenSure=Dispatcher.gecenSure + realTimeKuyruk.indexOf(j).calismaSuresi;
-
+					Dispatcher.sayac+=1;
 					// Eger proses realTimeKuyrugunda ise isi bitene kadar calistirilir ve sonlanir.
 					int prosesId=realTimeKuyruk.indexOf(j).prosesId;
 					int prosesinCalismaSuresi=realTimeKuyruk.indexOf(j).calismaSuresi;
 					
 					for(int k=0; k<prosesinCalismaSuresi; k++)
 					{
-						realTimeKuyruk.indexOf(j).ProsesCalistir( realTimeKuyruk.indexOf(j).prosesId ,realTimeKuyruk.indexOf(j).calismaSuresi,Dispatcher.gecenSure);	
+						if(realTimeKuyruk.indexOf(j).calismaSuresi-1==0) {
+							break;
+						}
+						
+						realTimeKuyruk.indexOf(j).ProsesCalistir( realTimeKuyruk.indexOf(j).prosesId ,realTimeKuyruk.indexOf(j).calismaSuresi,Dispatcher.sayac);	
+						Dispatcher.sayac+=1;
 					}
 					
 					// Biz bu oldurme islemini degerlerini 0'layarak belirtiyoruz.
 					realTimeKuyruk.indexOf(j).varisZamani=0;
 					realTimeKuyruk.indexOf(j).oncelik=0;
 					realTimeKuyruk.indexOf(j).calismaSuresi=0;
-					realTimeKuyruk.indexOf(j).terminatedProses();
+					realTimeKuyruk.indexOf(j).terminatedProses(Dispatcher.sayac);
 					
 					//Tekrar Txt'den okuma islemi yapsin ve diger satirlari okuyarak process islemine devam etsin.
 					Dispatcher.oku(Dispatcher.gecenSure, Dispatcher.kacinciSatirdayiz);
